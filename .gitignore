@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Regenerated training artifacts (recreated by python -m app.train_eval)
+data/
+models/
+
+# Prediction log + runtime API log (regenerated)
+app/outputs/predictions_log.csv
+app/outputs/api.log
+
+# Local-only presentation artifacts (never push)
+presentation.pptx
+app/outputs/presentation.pptx
+generate_slides.py
+docs/oral_presentation_15min.md
+docs/speaker_notes_15min.md
+docs/oral_presentation*.md
+docs/speaker_notes*.md
+
+# Presentation PNG outputs are intentionally tracked for GitHub evidence
+# app/outputs/*.png  <-- kept in repo
+
+app/outputs/presentation_with_architecture.pptx
+docs/cover_hero_*.png

@@ -1,0 +1,62 @@
+{
+  "service_name": "Model-to-Production IoT Anomalies API",
+  "framework": "Flask",
+  "runtime": "Python",
+  "containerized": true,
+  "docker_services": [
+    "iot-anomaly-api",
+    "iot-anomaly-sender"
+  ],
+  "endpoints": {
+    "/health": {
+      "method": "GET",
+      "purpose": "Service liveness and model availability status.",
+      "expected_input": "none",
+      "expected_output": "status, model_loaded, timestamp, service_name, version"
+    },
+    "/model-info": {
+      "method": "GET",
+      "purpose": "Expose trained model metadata for traceability.",
+      "expected_input": "none",
+      "expected_output": "model_type, model_version, feature_names, threshold and training metadata"
+    },
+    "/metrics": {
+      "method": "GET",
+      "purpose": "Expose runtime counters and average prediction latency.",
+      "expected_input": "none",
+      "expected_output": "request_count, prediction_count, anomaly_count, normal_count, average_latency_ms, model_loaded"
+    },
+    "/predict": {
+      "method": "POST",
+      "purpose": "Score one sensor reading and return anomaly decision.",
+      "expected_input": {
+        "temperature": "float",
+        "humidity": "float",
+        "sound_volume": "float"
+      },
+      "expected_output": "is_anomaly, anomaly_score, threshold, model_version, timestamp, input"
+    }
+  },
+  "logging": {
+    "prediction_log_path": "app/outputs/predictions_log.csv"
+  },
+  "monitoring": [
+    "health endpoint (/health)",
+    "metrics endpoint (/metrics)",
+    "prediction log CSV",
+    "generated PNG visuals in app/outputs"
+  ],
+  "reproducibility": [
+    "Dockerfile",
+    "docker-compose.yml",
+    "README.md",
+    "tests/test.py"
+  ],
+  "limitations": [
+    "Flask development server only.",
+    "No authentication or authorization.",
+    "No production database integration.",
+    "No real alerting pipeline.",
+    "No scheduled retraining workflow."
+  ]
+}

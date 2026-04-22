@@ -1,0 +1,55 @@
+{
+  "project_name": "Model-to-Production IoT Anomalies",
+  "model_type": "IsolationForest",
+  "model_version": "1.0.0",
+  "model_artifact_path": "models/iot_anomaly_iforest.pkl",
+  "feature_names": [
+    "temperature",
+    "humidity",
+    "sound_volume"
+  ],
+  "features": [
+    "temperature",
+    "humidity",
+    "sound_volume"
+  ],
+  "contamination": 0.1,
+  "n_estimators": 100,
+  "random_state": 42,
+  "threshold": -0.53541,
+  "training_script": "app/train_eval.py",
+  "training_date_utc": "2026-04-22T12:13:21.625748+00:00",
+  "training_date": "2026-04-22T12:13:21.625748+00:00",
+  "n_train_samples": 3000,
+  "data_type": "synthetic / fictional sample data",
+  "scenario": "Wind turbine component manufacturing",
+  "train_validation_test_split": {
+    "train": "60%",
+    "validation": "15%",
+    "test": "25%"
+  },
+  "evaluation_metrics": {
+    "train": {
+      "accuracy": 0.9587,
+      "precision": 0.7766,
+      "recall": 0.793,
+      "f1": 0.7847,
+      "roc_auc": 0.969
+    },
+    "validation": {
+      "accuracy": 0.968,
+      "precision": 0.8222,
+      "recall": 0.9024,
+      "f1": 0.8605,
+      "roc_auc": 0.9878
+    },
+    "test": {
+      "accuracy": 0.9568,
+      "precision": 0.7926,
+      "recall": 0.8045,
+      "f1": 0.7985,
+      "roc_auc": 0.972
+    }
+  },
+  "limitation_note": "The model was trained and evaluated on synthetic sensor data. Results validate the prototype workflow but do not prove real-world production performance."
+}

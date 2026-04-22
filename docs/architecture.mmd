@@ -1,0 +1,48 @@
+flowchart LR
+
+    subgraph Offline["Training Pipeline  (run once or on data change)"]
+        direction TB
+        SIM["Sensor Data Simulation\napp/train_eval.py\n5000 synthetic records\n10 percent anomaly injection\nnoise + borderline overlap"]
+        TRAIN["IsolationForest Training\ncontamination=0.10\nn_estimators=100\nunsupervised"]
+        TUNE["Threshold Tuning\nvalidation set\nmaximise F1"]
+        EVAL["Evaluation\nAcc / Prec / Rec / F1 / AUC\nconfusion matrices"]
+        PNG["PNG Outputs\napp/outputs/"]
+        SIM --> TRAIN --> TUNE --> EVAL --> PNG
+    end
+
+    subgraph Artifacts["Serialised Artifacts"]
+        direction TB
+        PKL["iot_anomaly_iforest.pkl\nmodels/"]
+        META["model_metadata.json\nmetadata/\n(includes tuned threshold)"]
+    end
+
+    subgraph Service["Prediction Service  (always-on)"]
+        direction TB
+        API["Flask REST API\napp/api.py  port 5000\nGET /health\nGET /model-info\nGET /metrics\nPOST /predict"]
+        DET["AnomalyDetector\napp/model.py\nthreshold-based decision"]
+        LOG["predictions_log.csv\napp/outputs/"]
+        API --> DET
+        API --> LOG
+    end
+
+    subgraph Stream["Stream Ingestion"]
+        SENDER["Sensor Stream Sender\napp/sender.py\nPOST /predict every N sec\nprints live ASCII table"]
+    end
+
+    subgraph Repro["Reproducibility and Testing"]
+        TEST["tests/test.py\nvalidates endpoints + outputs"]
+        DOCKER["Dockerfile\ndocker-compose.yml\niot-anomaly-api\niot-anomaly-sender"]
+    end
+
+    TRAIN -->|joblib.dump| PKL
+    TUNE  -->|saved in| META
+
+    PKL  -->|load at startup| DET
+    META -->|load at startup| API
+
+    SENDER -->|JSON payload\ntemp hum sound| API
+    API    -->|is_anomaly score threshold| SENDER
+
+    TEST   -->|HTTP GET POST| Service
+    DOCKER -->|orchestrates| Service
+    DOCKER -->|orchestrates| Stream

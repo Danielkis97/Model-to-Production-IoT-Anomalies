@@ -1,0 +1,42 @@
+{
+  "project_name": "Model-to-Production IoT Anomalies",
+  "data_source": "fictional synthetic sensor data",
+  "reason_for_synthetic_data": "No real factory dataset was available in the module scope, so synthetic data was generated to demonstrate an end-to-end model-to-production workflow.",
+  "scenario": "Wind turbine component manufacturing",
+  "generated_by": "app/train_eval.py",
+  "data_type": "synthetic / fictional sample data",
+  "features": {
+    "temperature": {
+      "unit": "Celsius",
+      "description": "Process temperature signal from the manufacturing line."
+    },
+    "humidity": {
+      "unit": "percent",
+      "description": "Ambient or process humidity level near production equipment."
+    },
+    "sound_volume": {
+      "unit": "arbitrary sound level / normalized sound intensity",
+      "description": "Acoustic intensity used as a proxy for vibration or mechanical stress."
+    }
+  },
+  "target_label": {
+    "name": "is_anomaly",
+    "description": "Binary reference label used for offline evaluation only; it is not required as API input."
+  },
+  "noise_design": {
+    "normal_variation": true,
+    "borderline_cases": true,
+    "overlapping_values": true,
+    "injected_anomalies": true
+  },
+  "split": {
+    "train": "60%",
+    "validation": "15%",
+    "test": "25%"
+  },
+  "limitations": [
+    "No real sensor hardware measurements are used.",
+    "Synthetic distributions approximate but do not replicate production behavior.",
+    "No long-term drift history is represented."
+  ]
+}

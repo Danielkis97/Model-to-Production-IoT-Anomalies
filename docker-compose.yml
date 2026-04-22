@@ -1,0 +1,76 @@
+version: "3.9"
+
+# Model-to-Production IoT Anomalies
+# IU Module DLBDSMTP01 - Project: From Model to Production
+#
+# Services:
+#   iot-anomaly-api    -> trains model (if needed) then serves REST API on :5000
+#   iot-anomaly-sender -> waits for healthy API, then streams sensor data
+#
+# Usage:
+#   docker compose up --build
+#   docker compose down
+
+networks:
+  iot-anomaly-network:
+    driver: bridge
+
+services:
+
+  iot-anomaly-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iot-anomaly-api
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./models:/project/models
+      - ./metadata:/project/metadata
+      - ./app/outputs:/project/app/outputs
+      - ./data:/project/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - iot-anomaly-network
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - |
+          import urllib.request, json, sys
+          try:
+            r = urllib.request.urlopen('http://localhost:5000/health', timeout=4)
+            d = json.loads(r.read())
+            sys.exit(0 if d.get('model_loaded') else 1)
+          except Exception:
+            sys.exit(1)
+      interval: 12s
+      timeout: 8s
+      retries: 20
+      start_period: 20s
+
+  iot-anomaly-sender:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iot-anomaly-sender
+    depends_on:
+      iot-anomaly-api:
+        condition: service_healthy
+    command:
+      - "python"
+      - "-m"
+      - "app.sender"
+      - "--url"
+      - "http://iot-anomaly-api:5000"
+      - "--interval"
+      - "2"
+    volumes:
+      - ./app/outputs:/project/app/outputs
+    environment:
+      - PYTHONUNBUFFERED=1
+    networks:
+      - iot-anomaly-network
+    restart: on-failure
