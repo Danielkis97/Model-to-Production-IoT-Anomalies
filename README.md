@@ -16,7 +16,7 @@ The scenario is a wind turbine component factory with three sensor channels:
 
 ---
 
-## Quick Repro
+## Quick Reproduction
 
 If you only want to verify the project quickly after cloning:
 
